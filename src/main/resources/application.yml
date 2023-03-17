@@ -1,0 +1,33 @@
+#设置server
+server:
+  port: 8080
+  tomcat:
+    uri-encoding: UTF-8
+spring:
+  #数据链接设置
+  datasource:
+    url: jdbc:mysql://localhost:3306/online_examination?useUnicode=true&characterEncoding=UTF-8&useSSL=false&autoReconnect=true&failOverReadOnly=false&serverTimezone=CTT
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 123456
+  #springMVC配置
+  mvc:
+    view:
+      prefix: /templates/
+      suffix: .html
+    static-path-pattern: /**
+  resources:
+    static-locations: classpath:/static/,classpth:/templates/
+#  jackson:
+#    serialization:
+#      write-dates-as-timestamps: true
+  #设置编码
+  http:
+    encoding:
+      enabled: true
+      charset: UTF-8
+      force: true
+#mybatis的SQL文件、实体类别名的扫描包
+mybatis:
+  mapper-locations: classpath:mapper/**/*.xml
+  type-aliases-package: com.ssm.online_examination_system.po,com.ssm.online_examination_system.vo

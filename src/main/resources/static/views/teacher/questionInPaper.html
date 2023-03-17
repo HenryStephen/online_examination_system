@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>老师选题</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="stylesheet" href="../../layuiadmin/layui/css/layui.css" media="all">
+	<link rel="stylesheet" href="../../layuiadmin/style/admin.css" media="all">
+</head>
+
+<body>
+<div class="layui-fluid">
+	<div class="layui-row layui-col-space15">
+		<div class="layui-col-md12">
+			<div class="layui-card layui-form" lay-filter="component-form-element">
+				<div class="layui-card-header" style="text-align: center; font-weight: bold;font-size: 16px;">试卷名称</div>
+				<div class="layui-card-body layui-row layui-col-space10">
+					<div  class="layui-card layui-form" lay-filter="component-form-element">
+						<div class="layui-card layui-form" lay-filter="component-form-element">
+							<div class="layui-card-header" style="font-weight: bold;">
+								<button class="layui-btn layui-btn-sm layui-btn-normal" type="button" lay-filter="addQuestion" id="addQuestion">&nbsp;选择题目&nbsp;</button>
+								<button class="layui-btn layui-btn-sm layui-btn-normal" type="button" lay-filter="nextStep" id="nextStep">&nbsp;下一步&nbsp;</button>
+							</div>
+						</div>
+					</div>
+					<div  class="layui-card layui-form" lay-filter="component-form-element">
+						<div class="layui-card layui-form" lay-filter="component-form-element">
+							<div class="layui-card-header" style="font-weight: bold;">一、判断题</div>
+							<div class="layui-card-body layui-row layui-col-space10" id="judgementList">
+							</div>
+						</div>
+					</div>
+					<div class="layui-card layui-form" lay-filter="component-form-element">
+						<div class="layui-card layui-form" lay-filter="component-form-element">
+							<div class="layui-card-header" style="font-weight: bold;">二、选择题</div>
+							<div class="layui-card-body layui-row layui-col-space10" id="selectionList">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script src="../../layuiadmin/layui/layui.js"></script>
+<script src="/layuiadmin/other/js/onload.js"></script>
+<script src="/layuiadmin/other/js/jquery-3.4.1.js"></script>
+<script>
+    layui.config({
+        base: '../../layuiadmin/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'form'], function() {
+        var $ = layui.$,
+            admin = layui.admin,
+            element = layui.element,
+            form = layui.form;
+        teacherOnload();
+        form.render(null, 'component-form-element');
+        element.render('breadcrumb', 'breadcrumb');
+	    //添加试题
+	    $("#addQuestion").on("click", function(){
+		    layer.open({
+			    type: 2,
+			    area: ['1200px', '600px'],
+			    fix: false, //不固定
+			    maxmin: false,
+			    shadeClose: true,
+			    shade: 0.4,
+			    title: '添加题目',
+			    content: 'selectTopic.html'
+		    },function (index) {
+			    layer.close(index);
+		    });
+	    });
+	    //当前题目的个数
+	    var currentQuestionLength = 1;
+	    //当前题目总分值
+	    var questionTotalgrade = 0;
+	    //用户选择的题目（按照用户选择题目的顺序）数组
+	    var questionArray = [];
+	    //正确顺序数组
+	    var questionData = [];
+	    //获取选择的题目
+	    getChildrenData = function(data){
+	    	//将用户选择的题目加入数组中
+		    var flag = false;
+	    	for(var i=0;i<data.length;i++){
+	    		var j = 0;
+	    		for(j=0;j<questionArray.length;j++){
+	    			if(data[i].questionId == questionArray[j].questionId){
+					    flag = true;
+	    				break;
+				    }
+			    }
+	    		if(j==questionArray.length){
+				    questionArray.push(data[i]);
+			    }
+		    }
+	    	if(flag){
+			    layer.msg('重复题目不会添加', {
+				    offset: '15px'
+				    ,icon: 2
+				    ,time: 1000
+			    });
+		    }
+		    rendData();
+	    }
+	    //渲染用户选择的数据
+	    function rendData(){
+	    	//设置当前题目个数为1
+		    currentQuestionLength = 1;
+		    //设置当前总分为0
+		    questionTotalgrade = 0;
+		    var judgementList = $("#judgementList");
+		    var selectionList = $("#selectionList");
+		    //清空元素
+		    judgementList.empty();
+		    //清空元素
+		    selectionList.empty();
+		    //将正确顺序数组清空
+		    questionData = [];
+		    //首先渲染判断题
+		    for(var i=0;i<questionArray.length;i++){
+			    if(questionArray[i].questionType == 2){
+			    	//渲染DOM
+				    renderList(questionArray[i],i);
+				    //加入正确顺序的数组中
+				    questionData.push(questionArray[i]);
+			    }
+		    }
+		    //再渲染选择题
+		    for(var i=0;i<questionArray.length;i++){
+			    if(questionArray[i].questionType == 1){
+			    	//渲染dom
+				    renderList(questionArray[i],i);
+				    //加入正确顺序的数组中
+				    questionData.push(questionArray[i]);
+			    }
+		    }
+	    }
+	    //渲染数据
+	    function renderList(data,i){
+		    var judgementList = $("#judgementList");
+		    var selectionList = $("#selectionList");
+		    var rightAnswer = "";
+		    //获得正确答案
+		    if(data.rightAnswer == 0){
+			    rightAnswer = "×";
+		    }else if(data.rightAnswer == 1){
+			    rightAnswer = "√";
+		    }else{
+			    rightAnswer = data.rightAnswer;
+		    }
+		    var card = $("<div class='layui-card layui-form' lay-filter='component-form-element'></div>");
+		    var cardHeader = $("<div class='layui-card-header'>"+currentQuestionLength+". "+data.question+"</div>");
+		    var bdiv = $("<div style='float: right;'></div>");
+		    var btn = $("<button class='layui-btn layui-btn-sm layui-btn-normal delete' id='"+i+"'>&nbsp;删除题目&nbsp;</button>");
+		    var cardBody = $("<div class='layui-card-body layui-row layui-col-space10'></div>");
+		    var md1 = $("<div class='layui-col-md12'></div>");
+		    var md2 = $("<div class='layui-col-md12'>正确答案："+rightAnswer+"</div>");
+		    var md3 = $("<div class='layui-col-md12'>解析："+data.analysis+"</div>");
+		    //代表选择题
+		    if(data.questionType == 1){
+			    var radioA = $("<div>A.&nbsp;&nbsp;"+data.optionA+"</div>");
+			    var radioB = $("<div>B.&nbsp;&nbsp;"+data.optionB+"</div>");
+			    var radioC = $("<div>C.&nbsp;&nbsp;"+data.optionC+"</div>");
+			    var radioD = $("<div>D.&nbsp;&nbsp;"+data.optionD+"</div>");
+			    bdiv.append(btn);cardHeader.append(bdiv);
+			    md1.append(radioA);md1.append(radioB);md1.append(radioC);md1.append(radioD);
+			    cardBody.append(md1);cardBody.append(md2);cardBody.append(md3);
+			    card.append(cardHeader);card.append(cardBody);
+			    selectionList.append(card);
+			    currentQuestionLength = currentQuestionLength + 1;
+			    questionTotalgrade = questionTotalgrade + data.grade;
+		    }else{//代表判断题
+			    bdiv.append(btn);cardHeader.append(bdiv);
+			    var right = $("<div>√</div>");
+			    var wrong = $("<div>×</div>");
+			    md1.append(right);md1.append(wrong);
+			    cardBody.append(md1);cardBody.append(md2);cardBody.append(md3);
+			    card.append(cardHeader);card.append(cardBody);
+			    judgementList.append(card);
+			    currentQuestionLength = currentQuestionLength + 1;
+			    questionTotalgrade = questionTotalgrade + data.grade;
+		    }
+	    }
+	    //添加删除事件
+	    $(document).on("click","button.delete",function(){
+	    	var _this = this;
+		    layer.confirm('真的删除吗', function(index){
+			    var i = _this.id;
+			    questionArray.splice(i,1);
+			    rendData();
+			    layer.close(index);
+		    });
+	    });
+	    //点击下一步
+	    $("#nextStep").on("click",function(){
+		    //获取上一个页面中的信息
+		    var paperData = sessionStorage.getItem("paperData");
+		    paperData = JSON.parse(paperData);
+		    paperData.questionTotalnum = currentQuestionLength - 1;
+		    paperData.questionTotalgrade = questionTotalgrade;
+		    paperData = JSON.stringify(paperData);
+		    sessionStorage.removeItem("paperData");
+		    sessionStorage.setItem("paperData",paperData);
+		    //生成试卷详情数组
+		    var paperdetail = [];
+		    //根据题目顺序向试卷详情中添加数据
+		    for(var i=0;i<questionData.length;i++){
+		    	var paperDetailQuestion = {};
+			    paperDetailQuestion.questionId = questionData[i].questionId;
+			    paperDetailQuestion.questionNo = i+1;
+			    paperdetail.push(paperDetailQuestion);
+		    }
+		    //将题目详情放入sessionStorage中
+		    sessionStorage.setItem("paperdetail",JSON.stringify(paperdetail));
+		    location.href = "examine.html";
+	    });
+	    $(function(){
+		    var paperData = sessionStorage.getItem("paperData");
+		    paperData = JSON.parse(paperData);
+		    $.ajax({
+			    url: '/paper/autoSelectQuestion',
+			    type: 'get',
+				data:{
+					subjectId: paperData.subjectId,
+					selectionNum: paperData.selectionNum,
+					judgementNum: paperData.judgementNum,
+					judgementComplexity: paperData.judgementComplexity,
+					selectionComplexity: paperData.selectionComplexity
+				},
+			    beforeSend: function(request){
+			    	request.setRequestHeader("teacherToken",localStorage.getItem("teacherToken"));
+			    },
+			    success:function(res){
+			    	var data = res.data;
+				    var flag = false;
+				    for(var i=0;i<data.length;i++){
+					    var j = 0;
+					    for(j=0;j<questionArray.length;j++){
+						    if(data[i].questionId == questionArray[j].questionId){
+						    	flag = true;
+							    break;
+						    }
+					    }
+					    if(j==questionArray.length){
+						    questionArray.push(data[i]);
+					    }
+				    }
+				    if(flag){
+					    layer.msg('重复题目不会添加', {
+						    offset: '15px'
+						    ,icon: 2
+						    ,time: 1000
+					    });
+				    }
+				    rendData();
+			    }
+		    })
+	    })
+
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>试卷解析</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<link rel="stylesheet" href="../../layuiadmin/layui/css/layui.css" media="all">
+		<link rel="stylesheet" href="../../layuiadmin/style/admin.css" media="all">
+	</head>
+	<body>
+		<div class="layui-fluid">
+			<div class="layui-row layui-col-space15">
+				<div class="layui-col-md12" id="scoreOfStudent">
+				</div>
+				<div class="layui-col-md12" id="questionList">
+				</div>
+			</div>
+		</div>
+
+		<script src="../../layuiadmin/layui/layui.js"></script>
+		<script src="/layuiadmin/other/js/onload.js"></script>
+		<script src="/layuiadmin/other/js/jquery-3.4.1.js"></script>
+		<script>
+			layui.config({
+				base: '../../layuiadmin/' //静态资源所在路径
+			}).extend({
+				index: 'lib/index' //主入口模块
+			}).use(['index', 'form'], function() {
+				var $ = layui.$,
+					admin = layui.admin,
+					element = layui.element,
+					form = layui.form;
+				studentOnload();
+				form.render(null, 'component-form-element');
+				element.render('breadcrumb', 'breadcrumb');
+				//获取请求参数的值
+				function GetQueryString(name)
+				{
+					var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+					var r = window.location.search.substr(1).match(reg);
+					if(r!=null)return  unescape(r[2]); return null;
+				}
+				//获取paperId
+				var paperId = GetQueryString("paperId");
+				//获取用户的分数
+				$.ajax({
+					url: '/student/selectScoreBypaperId',
+					type: 'get',
+					data: {
+						paperId : paperId
+					},
+					dataType: 'json',
+					beforeSend : function(request){
+						request.setRequestHeader("studentToken",localStorage.getItem("studentToken"));
+						request.setRequestHeader("studentName",sessionStorage.getItem("studentName"));
+					},
+					success: function(res){
+						var score = res.score;
+						var scoreOfStudent = $("#scoreOfStudent");
+						scoreOfStudent.empty();
+						var card = $("<div class='layui-card layui-form' lay-filter='component-form-element' style='text-align: center; color: red;'><h2>您的成绩为："+score+"</h2></div>");
+						scoreOfStudent.append(card);
+					}
+				});
+				//获取用户的答题情况
+				$.ajax({
+					url: '/student/seeHistoryAnswers',
+					type: 'post',
+					data: {
+						paperId : paperId
+					},
+					dataType: 'json',
+					beforeSend : function(request){
+						request.setRequestHeader("studentToken",localStorage.getItem("studentToken"));
+						request.setRequestHeader("studentName",sessionStorage.getItem("studentName"));
+					},
+					success: function(res){
+						var data = res.data;
+						var rightAnswer = "";
+						var userQuestion = "";
+						var questionList = $("#questionList");
+						questionList.empty();
+						for(var i=0;i<data.length;i++){
+							if(data[i].rightAnswer == 0){
+								rightAnswer = "×";
+							}else if(data[i].rightAnswer == 1){
+								rightAnswer = "√";
+							}else{
+								rightAnswer = data[i].rightAnswer;
+							}
+							if(data[i].userQuestion == 0){
+								userQuestion = "×";
+							}else if(data[i].userQuestion == 1){
+								userQuestion = "√";
+							}else{
+								userQuestion = data[i].userQuestion;
+							}
+							var card = $("<div class='layui-card layui-form' lay-filter='component-form-element'></div>");
+							var cardHeader = $("<div class='layui-card-header'>"+data[i].questionNo+". "+data[i].question+"</div>");
+							var cardBody = $("<div class='layui-card-body layui-row layui-col-space10'></div>");
+							var md1 = $("<div class='layui-col-md12'></div>");
+							var md2 = $("<div class='layui-col-md12'>正确答案："+rightAnswer+"</div>");
+							var md4 = $("<div class='layui-col-md12'>考生答案："+userQuestion+"</div>");
+							var md3 = $("<div class='layui-col-md12'>解析："+data[i].analysis+"</div>");
+							if(data[i].questionType == 1){
+								var radioA = $("<div>A.&nbsp;&nbsp;"+data[i].optionA+"</div>");
+								var radioB = $("<div>B.&nbsp;&nbsp;"+data[i].optionB+"</div>");
+								var radioC = $("<div>C.&nbsp;&nbsp;"+data[i].optionC+"</div>");
+								var radioD = $("<div>D.&nbsp;&nbsp;"+data[i].optionD+"</div>");
+								md1.append(radioA);md1.append(radioB);md1.append(radioC);md1.append(radioD);
+								cardBody.append(md1);
+							}else{
+								var right = $("<div>√</div>");
+								var wrong = $("<div>×</div>");
+								md1.append(right);md1.append(wrong);
+								cardBody.append(md1);
+							}
+							cardBody.append(md2);cardBody.append(md4);cardBody.append(md3);
+							card.append(cardHeader);card.append(cardBody);
+							questionList.append(card);
+						}
+						form.render(null, 'component-form-element');
+					}
+				})
+			});
+		</script>
+	</body>
+
+</html>

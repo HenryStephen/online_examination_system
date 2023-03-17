@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>考生答题</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<link rel="stylesheet" href="../../layuiadmin/layui/css/layui.css" media="all">
+		<link rel="stylesheet" href="../../layuiadmin/style/admin.css" media="all">
+		<link rel="stylesheet" type="text/css" href="../../layuiadmin/other/css/bootstrap.min.css">
+		<link rel="stylesheet" type="text/css" href="../../layuiadmin/other/css/styles.min.css">
+		<link rel="stylesheet" type="text/css" href="../../layuiadmin/other/css/style.css">
+		<link rel="stylesheet" type="text/css" href="../../layuiadmin/other/css/base.css">
+		<link rel="stylesheet" type="text/css" href="../../layuiadmin/other/css/exam_style.css">
+	</head>
+	<body>
+		<div class="layui-fluid">
+			<div class="layui-row layui-col-space15">
+				<div class="layui-col-md10" id="questionList">
+				</div>
+			</div>
+		</div>
+
+		<div class="nav-wrapper">
+			<div class="nav nav-status nav-operation">
+				<ul class="menu-items">
+					<li class="menu-item menu-item-time">
+						<div class="item-label">剩余时间</div>
+						<div class="item-data" id="timeDown">
+							00:00
+						</div>
+					</li>
+					<li class="menu-item menu-item-lang" id="switchLangBtn">
+						<button class="layui-btn caller-fr layui-btn-normal layui-btn-radius" lay-filter="submitPaper" id="submitPaper">
+							&nbsp;交卷&nbsp;
+						</button>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<script src="../../layuiadmin/layui/layui.js"></script>
+		<script src="/layuiadmin/other/js/onload.js"></script>
+		<script src="/layuiadmin/other/js/jquery-3.4.1.js"></script>
+		<script>
+			layui.config({
+				base: '../../layuiadmin/' //静态资源所在路径
+			}).extend({
+				index: 'lib/index' //主入口模块
+			}).use(['index', 'form'], function() {
+				var $ = layui.$,
+					admin = layui.admin,
+					element = layui.element,
+					form = layui.form;
+				studentOnload();
+				//获取请求参数的值
+				function GetQueryString(name)
+				{
+					var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+					var r = window.location.search.substr(1).match(reg);
+					if(r!=null)return  unescape(r[2]); return null;
+				}
+				//获取paperId
+				var paperId = GetQueryString("paperId");
+				var objectArray = [];
+				var answerArray = [];
+				//设置答卷总时长
+				var examDuration = 0;
+				//文档加载完毕
+				$(function(){
+					//查看试卷总时长
+					$.ajax({
+						type:'get',
+						url:'/paper/queryExamDuration',
+						data:{
+							paperId: paperId
+						},
+						dataType: 'json',
+						beforeSend: function(request){
+							request.setRequestHeader("studentToken",localStorage.getItem("studentToken"));
+						},
+						success: function(res){
+							if(res.status == 1){
+								examDuration = res.data;
+								//计时器
+								maxtime = examDuration * 60;
+								timer = setInterval(CountDown, 1000);
+							}
+						}
+					});
+					//获取试卷详细信息
+					$.ajax({
+						type:'get',
+						url:'/paper/queryPaperDetailAndQuestion',
+						data:{
+							paperId: paperId
+						},
+						dataType: 'json',
+						beforeSend: function(request){
+							request.setRequestHeader("studentToken",localStorage.getItem("studentToken"));
+						},
+						success: function(res){
+							var data = res.data;
+							var questionList = $("#questionList");
+							questionList.empty();
+							objectArray = [];
+							for(var i=0;i<data.length;i++){
+								objectArray.push({questionId: data[i].questionId, questionNo: data[i].questionNo, questionType: data[i].questionType});
+								var card = $("<div class='layui-card layui-form' lay-filter='component-form-element'></div>");
+								var cardHeader = $("<div class='layui-card-header'>"+data[i].questionNo+"."+data[i].question+"</div>");
+								var cardBody = $("<div class='layui-card-body layui-row layui-col-space10'></div>");
+								var md1 = $("<div class='layui-col-md12'></div>");
+								//代表选择题
+								if(data[i].questionType === 1){
+									var radioA = $("<input type='radio' name="+data[i].questionId+" value='A' title='A'/>"+data[i].optionA+"<br/>");
+									var radioB = $("<input type='radio' name="+data[i].questionId+" value='B' title='B'/>"+data[i].optionB+"<br/>");
+									var radioC = $("<input type='radio' name="+data[i].questionId+" value='C' title='C'/>"+data[i].optionC+"<br/>");
+									var radioD = $("<input type='radio' name="+data[i].questionId+" value='D' title='D'/>"+data[i].optionD+"<br/>");
+									md1.append(radioA);md1.append(radioB);md1.append(radioC);md1.append(radioD);
+									cardBody.append(md1);
+								}else{
+									var right = $("<input type='radio' name="+data[i].questionId+" value='1' title='√'/><br/>");
+									var wrong = $("<input type='radio' name="+data[i].questionId+" value='0' title='×'/><br/>");
+									md1.append(right);md1.append(wrong);
+									cardBody.append(md1);
+								}
+								card.append(cardHeader);card.append(cardBody);
+								questionList.append(card);
+							}
+							form.render(null, 'component-form-element');
+						}
+					});
+				});
+				//计时器函数
+				function CountDown() {
+					if (maxtime >= 0) {
+						minutes = Math.floor(maxtime / 60);
+						seconds = Math.floor(maxtime % 60);
+						if(minutes < 10){
+							minutes = "0"+minutes;
+						}else{
+							minutes = ""+minutes;
+						}
+						if(seconds < 10){
+							seconds = "0"+seconds;
+						}else{
+							seconds = ""+seconds;
+						}
+						$("#timeDown").html(minutes+":"+seconds);
+						if (maxtime == 5 * 60){
+							layer.confirm('距离结束仅剩5分钟', function(index){
+								layer.close(index);
+							});
+						}
+						--maxtime;
+					} else{
+						clearInterval(timer);
+						layer.confirm('时间到，结束!', function(index){
+							layer.close(index);
+						});
+						//时间到，直接交卷
+						submitPaper();
+					}
+				}
+				//点击交卷提交试卷
+				$("#submitPaper").on("click", function(){
+					layer.confirm('确定要交卷吗？', function(index){
+						layer.close(index);
+						submitPaper();
+					});
+				});
+				//提交试卷函数
+				function submitPaper() {
+					answerArray = [];
+					for (var i = 0; i < objectArray.length; i++) {
+						var questionId = objectArray[i].questionId;
+						//根据name查找元素(数组)
+						var questionIdElem = $("input[name=" + questionId + "]");
+						for (var j = 0; j < questionIdElem.length; j++) {
+							if (questionIdElem[j].checked == true) {
+								var userQuestion = questionIdElem[j].value;
+								answerArray.push({
+									paperId: parseInt(paperId),
+									questionId: questionId,
+									userQuestion: userQuestion
+								});
+								break;
+							}
+						}
+					}
+					$.ajax({
+						url: '/student/postPaper',
+						type: 'post',
+						data: JSON.stringify(answerArray),
+						contentType: 'application/json',
+						dataType: 'json',
+						beforeSend: function (request) {
+							request.setRequestHeader("studentToken", localStorage.getItem("studentToken"));
+							request.setRequestHeader("studentName", sessionStorage.getItem("studentName"));
+						},
+						success: function (res) {
+							location.href = 'analysis.html?paperId='+paperId;
+						}
+					});
+					return false;
+				}
+			});
+		</script>
+	</body>
+</html>

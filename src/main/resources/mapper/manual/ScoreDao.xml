@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.online_examination_system.mapper.manual.ScoreDao" >
+	<resultMap id="BaseResultMap" type="com.ssm.online_examination_system.vo.ScoreAndUser" >
+		<id column="paper_id" property="paperId" jdbcType="INTEGER" />
+		<id column="user_id" property="userId" jdbcType="INTEGER" />
+		<result column="score" property="score" jdbcType="INTEGER" />
+		<result column="user_name" jdbcType="VARCHAR" property="userName" />
+		<result column="user_password" jdbcType="VARCHAR" property="userPassword" />
+		<result column="user_telephone" jdbcType="VARCHAR" property="userTelephone" />
+		<result column="user_email" jdbcType="VARCHAR" property="userEmail" />
+		<result column="user_sex" jdbcType="INTEGER" property="userSex" />
+		<result column="user_realname" jdbcType="VARCHAR" property="userRealname" />
+		<result column="user_status" jdbcType="INTEGER" property="userStatus" />
+		<result column="user_academy" jdbcType="VARCHAR" property="userAcademy" />
+		<result column="user_role" jdbcType="INTEGER" property="userRole" />
+	</resultMap>
+	<resultMap id="BaseResultMap1" type="com.ssm.online_examination_system.po.Score" >
+		<id column="paper_id" property="paperId" jdbcType="INTEGER" />
+		<id column="user_id" property="userId" jdbcType="INTEGER" />
+		<result column="score" property="score" jdbcType="INTEGER" />
+	</resultMap>
+	<sql id="Base_Column_List" >
+    	paper_id, user_id, score, user_name, user_password, user_telephone, user_email, user_sex, user_realname, user_status, user_academy, user_role
+  	</sql>
+	<select id="selectScoreAndUser" resultMap="BaseResultMap" parameterType="com.ssm.online_examination_system.po.Score" >
+		select
+		a.paper_id, a.user_id, a.score, b.user_name, b.user_password, b.user_telephone, b.user_email, b.user_sex, b.user_realname, b.user_status, b.user_academy, b.user_role
+		from score a
+		left outer join users b on a.user_id = b.user_id
+		where
+			a.paper_id = #{paperId, jdbcType=INTEGER}
+	</select>
+	<select id="selectScoreBypaperId" resultMap="BaseResultMap1" parameterType="com.ssm.online_examination_system.po.Paper" >
+		select *
+		from score
+		where paper_id = #{paperId, jdbcType=INTEGER}
+	</select>
+</mapper>

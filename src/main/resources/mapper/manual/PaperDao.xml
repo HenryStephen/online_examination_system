@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.online_examination_system.mapper.manual.PaperDao" >
+	<resultMap id="BaseResultMap" type="com.ssm.online_examination_system.po.Paper" >
+		<id column="paper_id" property="paperId" jdbcType="INTEGER" />
+		<result column="paper_name" property="paperName" jdbcType="VARCHAR" />
+		<result column="question_totalnum" property="questionTotalnum" jdbcType="INTEGER" />
+		<result column="question_totalgrade" property="questionTotalgrade" jdbcType="INTEGER" />
+		<result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
+		<result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+		<result column="paper_level" property="paperLevel" jdbcType="INTEGER" />
+		<result column="paper_password" property="paperPassword" jdbcType="VARCHAR" />
+		<result column="paper_setter_id" property="paperSetterId" jdbcType="INTEGER" />
+		<result column="subject_id" property="subjectId" jdbcType="INTEGER" />
+		<result column="exam_duration" property="examDuration" jdbcType="INTEGER" />
+		<result column="pass_grade" property="passGrade" jdbcType="INTEGER" />
+	</resultMap>
+	<resultMap id="StudentAndPaperVo" type="com.ssm.online_examination_system.vo.StudentInPaperVo">
+		<result column="subject_name" property="subjectName" jdbcType="VARCHAR" />
+		<result column="user_name" property="userName" jdbcType="VARCHAR" />
+		<result column="user_academy" property="userAcademy" jdbcType="VARCHAR" />
+		<result column="paper_id" property="paperId" jdbcType="INTEGER" />
+		<result column="paper_name" property="paperName" jdbcType="VARCHAR" />
+		<result column="question_totalnum" property="questionTotalnum" jdbcType="INTEGER" />
+		<result column="question_totalgrade" property="questionTotalgrade" jdbcType="INTEGER" />
+		<result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
+		<result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+		<result column="paper_level" property="paperLevel" jdbcType="INTEGER" />
+		<result column="paper_password" property="paperPassword" jdbcType="VARCHAR" />
+		<result column="paper_setter_id" property="paperSetterId" jdbcType="INTEGER" />
+		<result column="subject_id" property="subjectId" jdbcType="INTEGER" />
+		<result column="exam_duration" property="examDuration" jdbcType="INTEGER" />
+		<result column="pass_grade" property="passGrade" jdbcType="INTEGER" />
+	</resultMap>
+	<sql id="Base_Column_List" >
+    paper_id, paper_name, question_totalnum, question_totalgrade, start_time, end_time,
+    paper_level, paper_password, paper_setter_id, subject_id, exam_duration, pass_grade
+  </sql>
+	<select id="selectBySelective" resultMap="BaseResultMap" parameterType="Paper" >
+		select
+		<include refid="Base_Column_List" />
+		from paper
+		<where>
+			<if test="paperId != null and paperId != '' " >
+				and paper_id = #{paperId,jdbcType=INTEGER}
+			</if>
+			<if test="paperName != null and paperName != '' " >
+				and paper_name like CONCAT(CONCAT('%',#{paperName}),'%')
+			</if>
+			<if test="questionTotalnum != null and questionTotalnum != '' " >
+				and question_totalnum = #{questionTotalnum,jdbcType=INTEGER}
+			</if>
+			<if test="questionTotalgrade != null and questionTotalgrade != '' " >
+				and question_totalgrade = #{questionTotalgrade,jdbcType=INTEGER}
+			</if>
+			<if test="startTime != null and startTime != '' " >
+				and start_time = #{startTime,jdbcType=TIMESTAMP}
+			</if>
+			<if test="endTime != null and endTime != '' " >
+				and end_time = #{endTime,jdbcType=TIMESTAMP}
+			</if>
+			<if test="paperLevel != null and paperLevel != '' " >
+				and paper_level = #{paperLevel,jdbcType=INTEGER}
+			</if>
+			<if test="paperPassword != null and paperPassword != '' " >
+				and paper_password = #{paperPassword,jdbcType=VARCHAR}
+			</if>
+			<if test="paperSetterId != null and paperSetterId != '' " >
+				and paper_setter_id = #{paperSetterId,jdbcType=INTEGER}
+			</if>
+			<if test="subjectId != null and subjectId != '' " >
+				and subject_id = #{subjectId,jdbcType=INTEGER}
+			</if>
+			<if test="examDuration != null and examDuration != '' " >
+				and exam_duration = #{examDuration,jdbcType=INTEGER}
+			</if>
+			<if test="passGrade != null and passGrade != '' " >
+				and pass_grade = #{passGrade,jdbcType=INTEGER}
+			</if>
+		</where>
+	</select>
+	<select id="selectPaperByAlreadyScore" resultMap="BaseResultMap" parameterType="Paper">
+		select DISTINCT a.paper_id,b.paper_name
+		from score a
+		left outer join paper b on a.paper_id = b.paper_id
+		where
+		b.paper_setter_id = #{paperSetterId}
+	</select>
+	<select id="selectByPaperId" parameterType="com.ssm.online_examination_system.vo.StudentInPaperVo" resultMap="StudentAndPaperVo">
+		select b.subject_name,c.user_name,c.user_academy,a.paper_id, a.paper_name, a.question_totalnum, a.question_totalgrade, a.start_time, a.end_time,
+		a.paper_level, a.paper_password, a.paper_setter_id, a.subject_id, a.exam_duration, a.pass_grade
+		from paper a
+		left outer join subject b on a.subject_id = b.subject_id
+		left outer  join  users c on a.paper_setter_id = c.user_id
+		<where>
+			<if test="paperId != null" >
+				and paper_id = #{paperId,jdbcType=INTEGER}
+			</if>
+			<if test="paperName != null" >
+				and paper_name = #{paperName,jdbcType=VARCHAR}
+			</if>
+		</where>
+	</select>
+	<select id="ifPassword" parameterType="com.ssm.online_examination_system.vo.StudentInPaperVo" resultMap="StudentAndPaperVo">
+		select
+		<include refid="Base_Column_List" />
+		from paper
+		<where>
+			<if test="paperId != null" >
+				and paper_id = #{paperId,jdbcType=INTEGER}
+			</if>
+			<if test="paperPassword != null" >
+				and paper_password = #{paperPassword,jdbcType=VARCHAR}
+			</if>
+		</where>
+	</select>
+	<select id="selectAllList" resultMap="StudentAndPaperVo">
+	   select b.subject_name,c.user_name,c.user_academy,a.paper_id, a.paper_name, a.question_totalnum, a.question_totalgrade, a.start_time, a.end_time,
+		a.paper_level, a.paper_password, a.paper_setter_id, a.subject_id, a.exam_duration, a.pass_grade
+		from paper a
+        left outer join subject b on a.subject_id = b.subject_id
+        left outer join  users c on a.paper_setter_id = c.user_id
+	</select>
+</mapper>

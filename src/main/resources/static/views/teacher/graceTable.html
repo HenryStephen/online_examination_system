@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>成绩数据表格</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="stylesheet" href="../../layuiadmin/layui/css/layui.css" media="all">
+	<link rel="stylesheet" href="../../layuiadmin/style/admin.css" media="all">
+</head>
+<body>
+<div class="layui-fluid">
+	<div class="layui-row layui-col-space15">
+		<div class="layui-col-md12">
+			<div class="layui-card">
+				<div class="layui-card-body">
+					<table class="layui-hide" id="test-table-autowidth"></table>
+				</div>
+			</div>
+		</div>
+		<div class="layui-col-md12">
+			<div class="layui-card" align="center">
+				<div class="layui-card-header">成绩分布柱状图</div>
+				<div class="layui-card-body">
+					<div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-normcol">
+						<div carousel-item id="LAY-index-normcol">
+							<div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script src="../../layuiadmin/layui/layui.js"></script>
+<script src="/layuiadmin/other/js/onload.js"></script>
+<script src="/layuiadmin/other/js/jquery-3.4.1.js"></script>
+<script>
+    layui.config({
+        base: '../../layuiadmin/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'table', 'senior','carousel','echarts'], function(){
+    	var $ = layui.$;
+        var table = layui.table;
+	    var carousel = layui.carousel;
+		var echarts = layui.echarts;
+		teacherOnload();
+	    //获取请求参数的值
+	    function GetQueryString(name)
+	    {
+		    var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+		    var r = window.location.search.substr(1).match(reg);
+		    if(r!=null)return  unescape(r[2]); return null;
+	    }
+	    //获取paperId
+	    var paperId = GetQueryString("paperId");
+	    var dataY = "";
+	    var dataX = [];
+	    $.ajax({
+		    url: '/paper/query',
+		    type: 'get',
+		    data:{
+			    paperId: paperId
+		    },
+		    async:true,
+		    dataType: 'json',
+		    beforeSend:function(request){
+			    request.setRequestHeader("teacherToken",localStorage.getItem("teacherToken"));
+		    },
+		    success:function(result){
+			    var grade = result.questionTotalgrade;
+			    $.ajax({
+				    url: '/score/analyze',
+				    type: 'get',
+				    data:{
+					    paperId: paperId
+				    },
+				    async:true,
+				    dataType: 'json',
+				    beforeSend:function(request){
+					    request.setRequestHeader("teacherToken",localStorage.getItem("teacherToken"));
+				    },
+				    success: function(res){
+					    dataY = res.data;
+					    if(grade >= 10 ){
+						    if(grade % 10 == 0){
+							    var length = parseInt(grade /10);
+							    var sum = 0;
+							    for(var i=0;i<length;i++){
+								    var sum1 = sum;
+								    if(i==0){
+									    sum = sum + 10;
+								    }else {
+									    sum = sum + 9;
+								    }
+								    dataX.push(sum1+"-"+sum);
+								    sum = sum +1;
+							    }
+						    }else{
+							    var length = parseInt(grade / 10);
+							    var sum = 0;
+							    if(grade - length*10 >= 5){
+								    for(var i=0;i<length;i++){
+									    var sum1 = sum;
+									    if(i==0){
+										    sum = sum + 10;
+									    }else {
+										    sum = sum + 9;
+									    }
+									    dataX.push(sum1+"-"+sum);
+									    sum = sum +1;
+								    }
+								    dataX.push(sum+"-"+grade);
+							    }else{
+								    console.log(length);
+								    for(var i=0;i<length-1;i++){
+									    var sum1 = sum;
+									    if(i==0){
+										    sum = sum + 10;
+									    }else {
+										    sum = sum + 9;
+									    }
+									    dataX.push(sum1+"-"+sum);
+									    sum = sum +1;
+								    }
+								    dataX.push(sum+"-"+grade);
+							    }
+						    }
+					    }else{
+						    dataX.push("0-"+grade);
+					    }
+					    rendData();
+				    }
+			    });
+		    }
+	    });
+	    table.set({headers:{teacherToken: localStorage.getItem("teacherToken")}});
+        table.render({
+            elem: '#test-table-autowidth'
+            ,url: '/score/queryList'
+		    ,method: 'get'
+	        ,data:{
+		        page: 1 //页码的参数名称，默认：page
+		        ,limit: 10//数据量的参数名，默认：limit
+	        }
+	        ,where:{
+		        paperId: paperId
+	        }
+	        ,response: {
+		        statusName: 'status' //数据状态的字段名称，默认：code
+		        ,statusCode: 1 //成功的状态码，默认：0
+		        ,msgName: 'msg' //状态信息的字段名称，默认：msg
+		        ,countName: 'count' //数据总数的字段名称，默认：count
+		        ,dataName: 'data' //数据列表的字段名称，默认：data
+	        }
+	        ,title: '成绩表'
+            ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+            ,cols: [[
+                {field:'userId', title: '学生编号', sort: true}
+                ,{field:'userName', title: '用户名'} //width 支持：数字、百分比和不填写。你还可以通过 minWidth 参数局部定义当前单元格的最小宽度，layui 2.2.1 新增
+		        ,{field:'userRealname', title: '真实姓名', srt: true, align: 'center'}
+		        ,{field:'userSex', title: '性别', sort: true}
+                ,{field:'userAcademy', title: '院校'}
+                ,{field:'score', title: '成绩', sort: true, align: 'center'}
+            ]],
+	        page: true,
+		    done:function(res, curr, count){
+			    $("[data-field = 'userSex']").children().each(function(){
+				    if($(this).text() == '1'){
+					    $(this).text("女");
+				    }else if($(this).text() == '2'){
+					    $(this).text("男");
+				    }
+			    });
+	        }
+        });
+	    //标准柱状图
+	    function rendData(){
+		    var echnormcol = [], normcol = [
+			    {
+				    title : {
+					    text: '试卷成绩分段分布图'
+				    },
+				    tooltip : {
+					    trigger: 'axis'
+				    },
+				    legend: {
+					    data:['人数']
+				    },
+				    calculable : true,
+				    xAxis : [
+					    {
+						    type : 'category',
+						    data : dataX
+					    }
+				    ],
+				    yAxis : [
+					    {
+						    type : 'value'
+					    }
+				    ],
+				    series : [
+					    {
+						    name:'人数',
+						    type:'bar',
+						    data:dataY,
+						    markPoint : {
+							    data : [
+								    {type : 'max', name: '最大值'},
+								    {type : 'min', name: '最小值'}
+							    ]
+						    },
+						    markLine : {
+							    data : [{type : 'average', name: '平均值'}]
+						    }
+					    }
+				    ]
+			    }
+		    ]
+			    ,elemNormcol = $('#LAY-index-normcol').children('div')
+			    ,renderNormcol = function(index){
+			    echnormcol[index] = echarts.init(elemNormcol[index], layui.echartsTheme);
+			    echnormcol[index].setOption(normcol[index]);
+			    window.onresize = echnormcol[index].resize;
+		    };
+		    if(!elemNormcol[0]) return;
+		    renderNormcol(0);
+	    }
+    });
+</script>
+</body>
+</html>

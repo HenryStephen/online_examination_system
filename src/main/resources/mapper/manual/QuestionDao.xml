@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.online_examination_system.mapper.manual.QuestionDao" >
+	<resultMap id="BaseResultMap" type="com.ssm.online_examination_system.vo.QuestionVo" >
+		<id column="question_id" property="questionId" jdbcType="INTEGER" />
+		<result column="question" property="question" jdbcType="VARCHAR" />
+		<result column="right_answer" property="rightAnswer" jdbcType="VARCHAR" />
+		<result column="option_a" property="optionA" jdbcType="VARCHAR" />
+		<result column="option_b" property="optionB" jdbcType="VARCHAR" />
+		<result column="option_c" property="optionC" jdbcType="VARCHAR" />
+		<result column="option_d" property="optionD" jdbcType="VARCHAR" />
+		<result column="analysis" property="analysis" jdbcType="VARCHAR" />
+		<result column="grade" property="grade" jdbcType="INTEGER" />
+		<result column="complexity" property="complexity" jdbcType="INTEGER" />
+		<result column="question_key" property="questionKey" jdbcType="VARCHAR" />
+		<result column="question_type" property="questionType" jdbcType="INTEGER" />
+		<result column="subject_id" property="subjectId" jdbcType="INTEGER" />
+		<result column="subject_name" property="subjectName" jdbcType="VARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List" >
+	    question_id, question, right_answer, option_a, option_b, option_c, option_d, analysis,
+	    grade, complexity, question_key, question_type, question.subject_id, subject_name
+  	</sql>
+	<select id="selectBySelective" resultMap="BaseResultMap" parameterType="QuestionVo" >
+		select
+		<include refid="Base_Column_List" />
+		from question,subject
+		<where>
+			<if test="true">
+				and question.subject_id = subject.subject_id
+			</if>
+			<if test="questionId != null" >
+				and question_id = #{questionId,jdbcType=INTEGER}
+			</if>
+			<if test="question != null" >
+				and question like CONCAT(CONCAT('%',#{question}),'%')
+			</if>
+			<if test="rightAnswer != null" >
+				and right_answer = #{rightAnswer,jdbcType=VARCHAR}
+			</if>
+			<if test="optionA != null" >
+				and option_a = #{optionA,jdbcType=VARCHAR}
+			</if>
+			<if test="optionB != null" >
+				and option_b = #{optionB,jdbcType=VARCHAR}
+			</if>
+			<if test="optionC != null" >
+				and option_c = #{optionC,jdbcType=VARCHAR}
+			</if>
+			<if test="optionD != null" >
+				and option_d = #{optionD,jdbcType=VARCHAR}
+			</if>
+			<if test="analysis != null" >
+				and analysis = #{analysis,jdbcType=VARCHAR}
+			</if>
+			<if test="grade != null" >
+				and grade = #{grade,jdbcType=INTEGER}
+			</if>
+			<if test="complexity != null" >
+				and complexity = #{complexity,jdbcType=INTEGER}
+			</if>
+			<if test="questionKey != null" >
+				and question_key like CONCAT(CONCAT('%',#{questionKey}),'%')
+			</if>
+			<if test="questionType != null" >
+				and question_type = #{questionType,jdbcType=INTEGER}
+			</if>
+			<if test="subjectId != null" >
+				and question.subject_id = #{subjectId,jdbcType=INTEGER}
+			</if>
+			<if test="subjectName != null" >
+				and subject_name like CONCAT(CONCAT('%',#{subjectName}),'%')
+			</if>
+		</where>
+		order by question_id asc
+	</select>
+
+</mapper>

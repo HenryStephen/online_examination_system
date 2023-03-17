@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>试卷解析</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="stylesheet" href="../../layuiadmin/layui/css/layui.css" media="all">
+	<link rel="stylesheet" href="../../layuiadmin/style/admin.css" media="all">
+</head>
+
+<body>
+<div class="layui-fluid">
+	<div class="layui-row layui-col-space15">
+		<div class="layui-col-md6">
+			<div  class="layui-card layui-form" lay-filter="component-form-element">
+				<br>
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">试卷名称</label>
+						&nbsp;&nbsp;
+						<div class="layui-input-inline">
+							<input type="text" name="paperName" id="paperName"  placeholder="试卷名称" autocomplete="off" class="layui-input" disabled style="border: none">
+						</div>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">科目名称</label>
+						&nbsp;&nbsp;
+						<div class="layui-input-inline">
+							<input type="text" name="subjectName" id="subjectName" placeholder="科目名称" autocomplete="off" class="layui-input" disabled style="border: none">
+						</div>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">开始时间</label>
+						<div class="layui-input-inline">
+							<input type="datetime-local" name="startTime" id="startTime"  lay-verify="date" placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">结束时间</label>
+						<div class="layui-input-inline">
+							<input type="datetime-local" name="endTime" id="endTime"  lay-verify="date" placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">试卷等级</label>
+						<div class="layui-input-block">
+							<input type="radio" name="paperLevel" value="1" title="公开" checked lay-filter="select">
+							<input type="radio" name="paperLevel" value="2" title="私密" lay-filter="select">
+							<input type="radio" name="paperLevel" value="3" title="密码" lay-filter="select">
+						</div>
+					</div>
+				</div>
+				<div class="layui-form-item layui-hide" id="auto">
+					<div class="layui-inline">
+						<label class="layui-form-label">密码</label>
+						<div class="layui-input-inline">
+							<input type="password" id="paperPassword" name="paperPassword" placeholder="密码" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">答题时长(分钟)</label>
+						<div class="layui-input-inline">
+							<input type="number" id="examDuration" name="examDuration" placeholder="答题时长" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">及格分数</label>
+						<div class="layui-input-inline">
+							<input type="number" name="passGrade" id="passGrade"  placeholder="及格分数" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+				</div>
+				<br>
+			</div>
+		</div>
+		<div class="layui-col-md6 layui-row">
+			<div class="layui-col-md10 ">
+				<div class="layui-card layui-form" lay-filter="component-form-element" id="paperD">
+				</div>
+				<div class="layui-card layui-form" lay-filter="component-form-element">
+					<div class="layui-card-header">
+						<div>
+							考试注意事项
+						</div>
+					</div>
+					<div class="layui-card-body">
+						一、考试开始30分钟后，考生不允许进入考场。
+						<br>
+						二、进入考场，只准携带钢笔或签字笔(黑色或蓝色)、2B铅笔、橡皮参加考试。随身携带的电子记事本、寻呼机、移动电话(应处于关闭状态)与其它物品一起放到考场内的存包处。
+						<br>
+						三、进入考场，按规定座位号入座后，将本人的身份证放在课桌右上角，以备监考员查验。
+						<br>
+						四、进入考场后需仔细听取监考员宣读考试规则，仔细阅读黑板上的注意事项，确保清楚考试时间及答题卡填涂规范;答题卡填涂不规范，成绩作废。
+						<br>
+						五、开考信号发出后才能答题。开考后不得互相借用文具。
+						<br>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script src="../../layuiadmin/layui/layui.js"></script>
+<script src="/layuiadmin/other/js/onload.js"></script>
+<script src="/layuiadmin/other/js/jquery-3.4.1.js"></script>
+	<script>
+        layui.config({
+            base: '../../layuiadmin/' //静态资源所在路径
+        }).extend({
+            index: 'lib/index' //主入口模块
+        }).use(['index', 'form'], function() {
+            var $ = layui.$,
+                admin = layui.admin,
+                element = layui.element,
+                form = layui.form;
+            teacherOnload();
+            form.render(null, 'component-form-element');
+            element.render('breadcrumb', 'breadcrumb');
+            //是否显示密码
+	        form.on('radio(select)', function(data) {
+		        var value = data.value;
+		        if(value == "3") {
+			        $('#auto').removeClass('layui-hide');
+		        } else {
+			        $('#auto').addClass('layui-hide');
+		        }
+	        });
+            //获取试卷基本信息和试卷详情信息
+            var paperData = sessionStorage.getItem("paperData");
+            var paperdetail = sessionStorage.getItem("paperdetail");
+	        paperData = JSON.parse(paperData);
+	        //设置试卷名称
+	        var paperName = $("#paperName");
+	        paperName.val(paperData.paperName);
+            //获取科目名称
+	        $.ajax({
+		        url: '/subject/query',
+		        type: 'get',
+		        data: {
+		        	subjectId: paperData.subjectId
+		        },
+		        dataType: 'json',
+		        beforeSend: function(request){
+		        	request.setRequestHeader("teacherToken",localStorage.getItem("teacherToken"));
+		        },
+		        success: function (data) {
+			        var subjectName = $("#subjectName");
+			        subjectName.val(data.subjectName);
+		        }
+	        });
+	        //时间格式化
+	        function dateFtt(fmt,date) {
+		        var o = {
+			        "M+" : date.getMonth()+1,     //月份
+			        "d+" : date.getDate(),     //日
+			        "h+" : date.getHours(),     //小时
+			        "m+" : date.getMinutes(),     //分
+			        "s+" : date.getSeconds(),     //秒
+			        "q+" : Math.floor((date.getMonth()+3)/3), //季度
+			        "S" : date.getMilliseconds()    //毫秒
+		        };
+		        if(/(y+)/.test(fmt))
+			        fmt=fmt.replace(RegExp.$1, (date.getFullYear()+"").substr(4 - RegExp.$1.length));
+		        for(var k in o)
+			        if(new RegExp("("+ k +")").test(fmt))
+				        fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+		        return fmt;
+	        }
+	        //渲染dom
+	        var paperD = $("#paperD");
+	        paperD.empty();
+	        var cardHead = $("<div class=\"layui-card-header\"></div>");
+	        var divP = $("<div>"+paperData.paperName +"</div>");
+	        cardHead.append(divP);
+	        var cardBody = $("<div class='layui-card-body'></div>");
+	        //试卷总分
+	        var form1 = $("<div class='layui-form-item'></div>");
+	        var div1 = $("<div class='layui-inline'></div>");
+	        var lab1 = $("<label class='layui-form-label'>总分：&nbsp;</label>");
+	        var div11 = $("<div class='layui-input-inline'></div>");
+	        var input1 = $("<input type='text' value='"+paperData.questionTotalgrade+"' autocomplete='off' class='layui-input' style='border: 0px;'  disabled>");
+	        div11.append(input1);div1.append(lab1);div1.append(div11);form1.append(div1);
+	        //创建人
+	        var form2 = $("<div class='layui-form-item'></div>");
+	        var div2 = $("<div class='layui-inline'></div>");
+	        var lab2 = $("<label class='layui-form-label'>创建人：&nbsp;</label>");
+	        var div22 = $("<div class='layui-input-inline'></div>");
+	        var input2 = $("<input type='text' value='"+sessionStorage.getItem("teacherName")+"' autocomplete='off' class='layui-input' style='border: 0px;'  disabled>");
+	        div22.append(input2);div2.append(lab2);div2.append(div22);form2.append(div2);
+	        //题目数量
+	        var form3 = $("<div class='layui-form-item'></div>");
+	        var div3 = $("<div class='layui-inline'></div>");
+	        var lab3 = $("<label class='layui-form-label'>试题数量：&nbsp;</label>");
+	        var div33 = $("<div class='layui-input-inline'></div>");
+	        var input3 = $("<input type='text' value='"+paperData.questionTotalnum+"' autocomplete='off' class='layui-input' style='border: 0px;'  disabled>");
+	        div33.append(input3);div3.append(lab3);div3.append(div33);form3.append(div3);
+	        //创建时间
+	        var form4 = $("<div class='layui-form-item'></div>");
+	        var div4 = $("<div class='layui-inline'></div>");
+	        var lab4 = $("<label class='layui-form-label'>创建时间：&nbsp;</label>");
+	        var div44 = $("<div class='layui-input-inline'></div>");
+	        var input4 = $("<input type='text' value='"+dateFtt("yyyy-MM-dd hh:mm:ss",new Date())+"' autocomplete='off' class='layui-input' style='border: 0px;'  disabled>");
+	        div44.append(input4);div4.append(lab4);div4.append(div44);form4.append(div4);
+	        //工具
+	        var form5 = $("<div class='layui-form-item'></div>");
+	        var div5 = $("<div class='layui-inline'></div>");
+	        var btn3 = $("<button class=\"layui-btn layui-btn-sm layui-btn-normal\" lay-filter=\"createPaper\" id=\"createPaper\"><i class=\"layui-icon\">&#xe602;</i> 创建试卷</button>");
+	        div5.append(btn3);form5.append(div5);
+	        cardBody.append(div1);cardBody.append(div2);cardBody.append(div3);cardBody.append(div4);cardBody.append(div5);
+	        paperD.append(cardHead);paperD.append(cardBody);
+	        //点击创建试卷
+	        $("#createPaper").on("click",function(){
+		        var startTime = $.trim($("#startTime").val())=='' ? '' : $.trim($("#startTime").val());
+		        var endTime = $.trim($("#endTime").val())=='' ? '' : $.trim($("#endTime").val());
+	        	var paperLevel = $("input[name='paperLevel']");
+	        	var examDuration = $.trim($("#examDuration").val())=='' ? '' : $.trim($("#examDuration").val());
+	        	var passGrade = $.trim($("#passGrade").val())=='' ? '' : $.trim($("#passGrade").val());
+	        	var paperLevelVal = "";
+	        	for(var i=0;i<paperLevel.length;i++){
+	        		if(paperLevel[i].checked == true){
+				        paperLevelVal = paperLevel[i].value;
+				        break;
+			        }
+		        }
+	        	if(paperLevelVal == 3){
+	        		var paperPassword = $.trim($("#paperPassword").val())=='' ? '' : $.trim($("#paperPassword").val());
+	        		paperData.paperPassword = paperPassword;
+		        }
+	        	//向试卷基本信息中添加数据
+	        	paperData.startTime = startTime;
+		        paperData.endTime = endTime;
+		        paperData.paperLevel = paperLevelVal;
+		        paperData.examDuration = examDuration;
+		        paperData.passGrade = passGrade;
+		        paperData = JSON.stringify(paperData);
+		        sessionStorage.removeItem("paperData");
+		        sessionStorage.setItem("paperData",paperData);
+		        $.ajax({
+			        url: '/paper/createPaper',
+			        type: 'post',
+			        data: JSON.stringify({paper: paperData, paperdetailList: paperdetail}),
+			        dataType: 'json',
+			        contentType: 'application/json',
+			        beforeSend: function(request){
+				        request.setRequestHeader("teacherName",sessionStorage.getItem("teacherName"));
+				        request.setRequestHeader("teacherToken",localStorage.getItem("teacherToken"));
+			        },
+			        success: function (res) {
+			        	if(res.status == 1){
+					        var paperId = res.data;
+					        layer.confirm(res.msg, function(index){
+						        layer.close(index);
+						        location.href = "papers.html?paperId="+paperId;
+					        });
+				        }else{
+					        layer.confirm(res.msg, function(index){
+						        layer.close(index);
+					        });
+				        }
+			        }
+		        })
+		        return false;
+	        })
+        });
+	</script>
+</body>
+
+</html>

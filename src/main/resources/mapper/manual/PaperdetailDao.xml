@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.online_examination_system.mapper.manual.PaperdetailDao" >
+	<resultMap id="BaseResultMap" type="com.ssm.online_examination_system.po.Paperdetail" >
+		<id column="paper_id" property="paperId" jdbcType="INTEGER" />
+		<id column="question_id" property="questionId" jdbcType="INTEGER" />
+		<result column="question_no" property="questionNo" jdbcType="INTEGER" />
+	</resultMap>
+	<resultMap id="PaperDetailAndQuestionMap" type="com.ssm.online_examination_system.vo.PaperDetailAndQuestion" >
+		<id column="paper_id" property="paperId" jdbcType="INTEGER" />
+		<id column="question_id" property="questionId" jdbcType="INTEGER" />
+		<result column="question_no" property="questionNo" jdbcType="INTEGER" />
+		<result column="question" property="question" jdbcType="VARCHAR" />
+		<result column="right_answer" property="rightAnswer" jdbcType="VARCHAR" />
+		<result column="option_a" property="optionA" jdbcType="VARCHAR" />
+		<result column="option_b" property="optionB" jdbcType="VARCHAR" />
+		<result column="option_c" property="optionC" jdbcType="VARCHAR" />
+		<result column="option_d" property="optionD" jdbcType="VARCHAR" />
+		<result column="analysis" property="analysis" jdbcType="VARCHAR" />
+		<result column="grade" property="grade" jdbcType="INTEGER" />
+		<result column="question_type" property="questionType" jdbcType="INTEGER" />
+	</resultMap>
+
+	<sql id="Base_Column_List" >
+    	paper_id, question_id, question_no
+  	</sql>
+
+	<delete id="deleteByPaperId" parameterType="Integer" >
+    	delete from paperdetail
+    	where paper_id = #{paperId,jdbcType=INTEGER}
+  	</delete>
+
+	<select id="selectPaperDetailAndQuestionByPaperId" parameterType="Integer" resultMap="PaperDetailAndQuestionMap">
+		select a.paper_id,a.question_id,a.question_no,b.question,b.right_answer,b.option_a,b.option_b,b.option_c,b.option_d,b.analysis,b.grade,b.question_type
+		from paperdetail a
+		left outer join question b on b.question_id = a.question_id
+		where
+			a.paper_id = #{paperId}
+	</select>
+</mapper>

@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.online_examination_system.mapper.auto.QuestionMapper" >
+  <resultMap id="BaseResultMap" type="com.ssm.online_examination_system.po.Question" >
+    <id column="question_id" property="questionId" jdbcType="INTEGER" />
+    <result column="question" property="question" jdbcType="VARCHAR" />
+    <result column="right_answer" property="rightAnswer" jdbcType="VARCHAR" />
+    <result column="option_a" property="optionA" jdbcType="VARCHAR" />
+    <result column="option_b" property="optionB" jdbcType="VARCHAR" />
+    <result column="option_c" property="optionC" jdbcType="VARCHAR" />
+    <result column="option_d" property="optionD" jdbcType="VARCHAR" />
+    <result column="analysis" property="analysis" jdbcType="VARCHAR" />
+    <result column="grade" property="grade" jdbcType="INTEGER" />
+    <result column="complexity" property="complexity" jdbcType="INTEGER" />
+    <result column="question_key" property="questionKey" jdbcType="VARCHAR" />
+    <result column="question_type" property="questionType" jdbcType="INTEGER" />
+    <result column="subject_id" property="subjectId" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    question_id, question, right_answer, option_a, option_b, option_c, option_d, analysis, 
+    grade, complexity, question_key, question_type, subject_id
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from question
+    where question_id = #{questionId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from question
+    where question_id = #{questionId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.ssm.online_examination_system.po.Question" >
+    insert into question (question_id, question, right_answer, 
+      option_a, option_b, option_c, 
+      option_d, analysis, grade, 
+      complexity, question_key, question_type,
+      subject_id)
+    values (#{questionId,jdbcType=INTEGER}, #{question,jdbcType=VARCHAR}, #{rightAnswer,jdbcType=VARCHAR}, 
+      #{optionA,jdbcType=VARCHAR}, #{optionB,jdbcType=VARCHAR}, #{optionC,jdbcType=VARCHAR}, 
+      #{optionD,jdbcType=VARCHAR}, #{analysis,jdbcType=VARCHAR}, #{grade,jdbcType=INTEGER}, 
+      #{complexity,jdbcType=INTEGER}, #{questionKey,jdbcType=VARCHAR}, #{questionType,jdbcType=INTEGER},
+      #{subjectId,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ssm.online_examination_system.po.Question" >
+    insert into question
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="questionId != null" >
+        question_id,
+      </if>
+      <if test="question != null" >
+        question,
+      </if>
+      <if test="rightAnswer != null" >
+        right_answer,
+      </if>
+      <if test="optionA != null" >
+        option_a,
+      </if>
+      <if test="optionB != null" >
+        option_b,
+      </if>
+      <if test="optionC != null" >
+        option_c,
+      </if>
+      <if test="optionD != null" >
+        option_d,
+      </if>
+      <if test="analysis != null" >
+        analysis,
+      </if>
+      <if test="grade != null" >
+        grade,
+      </if>
+      <if test="complexity != null" >
+        complexity,
+      </if>
+      <if test="questionKey != null" >
+        question_key,
+      </if>
+      <if test="questionType != null" >
+        question_type,
+      </if>
+      <if test="subjectId != null" >
+        subject_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="questionId != null" >
+        #{questionId,jdbcType=INTEGER},
+      </if>
+      <if test="question != null" >
+        #{question,jdbcType=VARCHAR},
+      </if>
+      <if test="rightAnswer != null" >
+        #{rightAnswer,jdbcType=VARCHAR},
+      </if>
+      <if test="optionA != null" >
+        #{optionA,jdbcType=VARCHAR},
+      </if>
+      <if test="optionB != null" >
+        #{optionB,jdbcType=VARCHAR},
+      </if>
+      <if test="optionC != null" >
+        #{optionC,jdbcType=VARCHAR},
+      </if>
+      <if test="optionD != null" >
+        #{optionD,jdbcType=VARCHAR},
+      </if>
+      <if test="analysis != null" >
+        #{analysis,jdbcType=VARCHAR},
+      </if>
+      <if test="grade != null" >
+        #{grade,jdbcType=INTEGER},
+      </if>
+      <if test="complexity != null" >
+        #{complexity,jdbcType=INTEGER},
+      </if>
+      <if test="questionKey != null" >
+        #{questionKey,jdbcType=VARCHAR},
+      </if>
+      <if test="questionType != null" >
+        #{questionType,jdbcType=INTEGER},
+      </if>
+      <if test="subjectId != null" >
+        #{subjectId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ssm.online_examination_system.po.Question" >
+    update question
+    <set >
+      <if test="question != null" >
+        question = #{question,jdbcType=VARCHAR},
+      </if>
+      <if test="rightAnswer != null" >
+        right_answer = #{rightAnswer,jdbcType=VARCHAR},
+      </if>
+      <if test="optionA != null" >
+        option_a = #{optionA,jdbcType=VARCHAR},
+      </if>
+      <if test="optionB != null" >
+        option_b = #{optionB,jdbcType=VARCHAR},
+      </if>
+      <if test="optionC != null" >
+        option_c = #{optionC,jdbcType=VARCHAR},
+      </if>
+      <if test="optionD != null" >
+        option_d = #{optionD,jdbcType=VARCHAR},
+      </if>
+      <if test="analysis != null" >
+        analysis = #{analysis,jdbcType=VARCHAR},
+      </if>
+      <if test="grade != null" >
+        grade = #{grade,jdbcType=INTEGER},
+      </if>
+      <if test="complexity != null" >
+        complexity = #{complexity,jdbcType=INTEGER},
+      </if>
+      <if test="questionKey != null" >
+        question_key = #{questionKey,jdbcType=VARCHAR},
+      </if>
+      <if test="questionType != null" >
+        question_type = #{questionType,jdbcType=INTEGER},
+      </if>
+      <if test="subjectId != null" >
+        subject_id = #{subjectId,jdbcType=INTEGER},
+      </if>
+    </set>
+    where question_id = #{questionId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ssm.online_examination_system.po.Question" >
+    update question
+    set question = #{question,jdbcType=VARCHAR},
+      right_answer = #{rightAnswer,jdbcType=VARCHAR},
+      option_a = #{optionA,jdbcType=VARCHAR},
+      option_b = #{optionB,jdbcType=VARCHAR},
+      option_c = #{optionC,jdbcType=VARCHAR},
+      option_d = #{optionD,jdbcType=VARCHAR},
+      analysis = #{analysis,jdbcType=VARCHAR},
+      grade = #{grade,jdbcType=INTEGER},
+      complexity = #{complexity,jdbcType=INTEGER},
+      question_key = #{questionKey,jdbcType=VARCHAR},
+      question_type = #{questionType,jdbcType=INTEGER},
+      subject_id = #{subjectId,jdbcType=INTEGER}
+    where question_id = #{questionId,jdbcType=INTEGER}
+  </update>
+</mapper>

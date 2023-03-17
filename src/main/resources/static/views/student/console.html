@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>学生主页</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="stylesheet" href="../../layuiadmin/layui/css/layui.css" media="all">
+	<link rel="stylesheet" href="../../layuiadmin/style/admin.css" media="all">
+</head>
+<body>
+	<div class="layui-fluid">
+		<div class="layui-row layui-col-space15">
+			<div class="layui-col-md12">
+				<div class="layui-card">
+					<div class="layui-card-header">快捷方式</div>
+					<div class="layui-card-body">
+						<div class="layui-carousel layadmin-carousel layadmin-shortcut">
+							<div carousel-item>
+								<ul class="layui-row layui-col-space10">
+									<li class="layui-col-md3">
+										<a lay-href="student/test.html">
+											<i class="layui-icon layui-icon-console"></i>
+											<cite>考试</cite>
+										</a>
+									</li>
+									<li class="layui-col-md3">
+										<a lay-href="student/history.html">
+											<i class="layui-icon layui-icon-chart"></i>
+											<cite>历史答题情况</cite>
+										</a>
+									</li>
+									<li class="layui-col-md3">
+										<a lay-href="student/info.html">
+											<i class="layui-icon layui-icon-set"></i>
+											<cite>我的资料</cite>
+										</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="layui-col-md12">
+				<div class="layui-card">
+					<div class="layui-card-header">
+						考试注意事项
+						<i class="layui-icon layui-icon-tips" lay-tips="要支持的噢" lay-offset="5"></i>
+					</div>
+					<div class="layui-card-body layui-text layadmin-text">
+						<p>一.&nbsp;&nbsp;以平常心态考试会发挥得更好。紧张时，闭眼，静一静。</p>
+						<p>二.&nbsp;&nbsp;考前不给自己定科目考试分数目标会考得更好。</p>
+						<p>三.&nbsp;&nbsp;审题要仔细要审完关键字要标识能减少失误。</p>
+						<p>四.&nbsp;&nbsp;遇到3--4分钟没思路的题可暂时放弃,演算很复杂的题可等容易简单的题做完后再做，切不可在一道题上消耗过多的宝贵时间。</p>
+						<p>五.&nbsp;&nbsp;解题时只专心在本题 上会大大提高正确率，一心二用易失误。</p>
+						<p>六.&nbsp;&nbsp;以中等速度解题争取做一题对一题，做对比做完重要一万倍。</p>
+						<p>七.&nbsp;&nbsp;会的题要保证全对，中档题要争取全对，不会的题争取不交白卷。低档题和中档题全做对就能考上一本!</p>
+						<p>八.&nbsp;&nbsp;力争--次做对，不要指望有时间检查和修改。</p>
+						<p>九.&nbsp;&nbsp;整洁清爽的卷面， 正确的书写，会赢得改卷老师的欢喜。</p>
+						<p>十.&nbsp;&nbsp;解题时要由易到难，尤其是理综卷可看成是一门课。容易的题先做，拿到了基本分，心踏实了，反而会发挥得更好。</p>
+					</div>
+				</div>
+			</div>
+			<div class="layui-col-md12">
+				<div class="layui-card">
+					<div class="layui-card-header">
+						在线考试系统
+						<i class="layui-icon layui-icon-tips" lay-tips="要支持的噢" lay-offset="5"></i>
+					</div>
+					<div class="layui-card-body layui-text layadmin-text">
+						<p>考试作为大多数学校与一些教育培训机构的重要检测环节，在我国当前的教育制度下有着十分重要的作用，它不但是衡量学校和教育机构教学质量好坏的重要手段，同时也是促进学生,更好的完善自己，寻找差距的基础平台。一般来讲，传统的考试需要经历命题、考试、阅卷、成绩四大主要步骤，其中每-一个步骤都需要考试管理人员的充分参与，这为考试管理人员带来了非常繁琐的操作过程和不断重复的高强度劳动。归纳起来，传统考试具有以下几方面明显的弊端:应试者始终处于被动状态;考试过程缺乏灵活性;考试组织效率很低。</p>
+						<p>实际上，在网络技术日益发达的环境下，参与考试的主体都希望能够借助网络环境让考试的过程更加公平、更加轻松，更重要的是，学生希望自己的学习效果得到有效准确的检验;教师则希望在考试准备、考试进程以及考试结束的所有环节中都能够有高效率;对学校而言则更希望能够通过网络考试实现对学生学习成绩的及时跟踪与评价。网络考试系统便是在这样一-种需求背景下出现的，其目的就是在互联网条件下实现新的考试模式，从而可以营造出公平的考试环境，降低考试环节复杂性，改善考试管理水平的要求。</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="../../layuiadmin/layui/layui.js?t=1"></script>
+	<script src="/layuiadmin/other/js/onload.js"></script>
+	<script src="/layuiadmin/other/js/jquery-3.4.1.js"></script>
+	<script>
+		layui.config({
+			base: '../../layuiadmin/' //静态资源所在路径
+		}).extend({
+			index: 'lib/index' //主入口模块
+		}).use(['index', 'console'],function(){
+			var $ = layui.$;
+			studentOnload();
+		});
+	</script>
+</body>
+</html>
+

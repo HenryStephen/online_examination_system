@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>考试</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<link rel="stylesheet" href="../../layuiadmin/layui/css/layui.css" media="all">
+		<link rel="stylesheet" href="../../layuiadmin/style/admin.css" media="all">
+	</head>
+	<body>
+		<div class="layui-fluid">
+			<div class="layui-row layui-col-space15">
+				<div class="layui-col-md12" id="paperList">
+				</div>
+			</div>
+		</div>
+
+		<script src="../../layuiadmin/layui/layui.js"></script>
+		<script src="/layuiadmin/other/js/onload.js"></script>
+		<script src="/layuiadmin/other/js/jquery-3.4.1.js"></script>
+		<script>
+			layui.config({
+				base: '../../layuiadmin/' //静态资源所在路径
+			}).extend({
+				index: 'lib/index' //主入口模块
+			}).use(['index'],function(){
+				var $ = layui.$;
+				studentOnload();
+				//文档加载结束触发函数
+				$(function () {
+					//获取试卷列表
+					getPaper();
+				});
+				//转换时间的函数
+				function renderTime(date) {
+					var dateee = new Date(date).toJSON();
+					return new Date(+new Date(dateee) + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '');
+				}
+				//获得试卷列表
+				function getPaper(){
+					//获得试卷列表
+					$.ajax({
+						url:'/student/selectAllPapers',
+						type:'get',
+						beforeSend: function(request){
+							request.setRequestHeader("studentToken",localStorage.getItem("studentToken"));
+							request.setRequestHeader("studentName",sessionStorage.getItem("studentName"));
+						},
+						success:function(res){
+							var data = res.data;
+							rendList(data);
+						}
+					});
+				}
+				//渲染List函数
+				function rendList(data) {
+					var paperList = $("#paperList");
+					paperList.empty();
+					if(data != null && data.length!=0){
+						var pastData = [];
+						var reData = [];
+						for (var i = 0; i < data.length; i++) {
+							//获取当前时间戳
+							var currTimeStamp = parseInt(new Date().getTime());
+							//获取开始时间的时间戳
+							var startTimeDate = renderTime(data[i].startTime);
+							startTimeDate = startTimeDate.replace(/-/g,'/');
+							var startTimeStamp = new Date(startTimeDate).getTime();
+							//获取结束时间的时间戳
+							var endTimeDate = renderTime(data[i].endTime);
+							endTimeDate = endTimeDate.replace(/-/g,'/');
+							var endTimeStamp = new Date(endTimeDate).getTime();
+							//代表试卷过期
+							if(currTimeStamp > parseInt(endTimeStamp)){
+								pastData.push(data[i]);
+								continue;
+							}else if(currTimeStamp < parseInt(startTimeStamp)){
+								reData.push(data[i]);
+								continue;
+							}
+							var paperLev = "";
+							if (data[i].paperLevel == 1) {
+								paperLev = "公开";
+							} else if (data[i].paperLevel == 2) {
+								paperLev = "私密";
+							} else if (data[i].paperLevel == 3) {
+								paperLev = "密码";
+							}
+							var cardDiv = $("<div class='layui-card'></div>");
+							var cardbodyDiv = $("<div class='layui-card-body'></div>");
+							var divA = $("<div name='divA'></div>");
+							var divB = $("<div style='margin-top: 5px'>");
+							var aH = "";
+							if(paperLev === "密码"){
+								aH = $("<a href='javascript:void(0);' class='verifyPassword' id='"+data[i].paperId+"' >"+data[i].paperName+"</a>");
+							}else{
+								aH = $("<a href='examInfo.html?paperId=" + data[i].paperId + "'>" + data[i].paperName + "</a>");
+							}
+							var btnA = "";
+							if (paperLev === "公开") {
+								btnA = $("<button class=\"layui-btn layui-btn-xs caller-fr\" style=\"float: right;\">\n" +
+									"\t\t\t\t\t\t\t        &nbsp;" + paperLev + "&nbsp;\n" +
+									"\t\t\t\t\t            </button>");
+							} else if (paperLev === "私密") {
+								btnA = $("<button class=\"layui-btn layui-btn-xs caller-fr layui-btn-danger\" style=\"float: right;\">\n" +
+									"\t\t\t\t\t\t\t        &nbsp;" + paperLev + "&nbsp;\n" +
+									"\t\t\t\t\t            </button>");
+							} else if (paperLev === "密码") {
+								btnA = $("<button class=\"layui-btn layui-btn-xs caller-fr layui-btn-normal\" style=\"float: right;\">\n" +
+									"\t\t\t\t\t\t\t        &nbsp;" + paperLev + "&nbsp;\n" +
+									"\t\t\t\t\t            </button>");
+							}
+							var spanA = $("<span style=\"font-size: 12px;\">考试时间："+renderTime(data[i].startTime)+"  ~  "+renderTime(data[i].endTime) +"</span>");
+							var divC = $("<div style=\"float: right; font-size: 12px;\">"+data[i].userName+"</div>");
+							divA.append(aH);
+							divA.append(btnA);
+							divB.append(spanA);
+							divB.append(divC);
+							cardbodyDiv.append(divA);
+							cardbodyDiv.append(divB);
+							cardDiv.append(cardbodyDiv);
+							paperList.append(cardDiv);
+						}
+						//代表有还没有到达考试时间的试卷
+						if(reData != null && reData.length > 0){
+							for(var i=0;i<reData.length;i++){
+								var paperLev = "";
+								if (reData[i].paperLevel == 1) {
+									paperLev = "公开";
+								} else if (reData[i].paperLevel == 2) {
+									paperLev = "私密";
+								} else if (reData[i].paperLevel == 3) {
+									paperLev = "密码";
+								}
+								var cardDiv = $("<div class='layui-card'></div>");
+								var cardbodyDiv = $("<div class='layui-card-body'></div>");
+								var divA = $("<div name='divA'></div>");
+								var divB = $("<div style='margin-top: 5px'>");
+								var aH = "";
+								if(paperLev === "密码"){
+									aH = $("<a href='javascript:void(0);' class='verifyTime' id='"+reData[i].paperId+"' >"+reData[i].paperName+"</a>");
+								}else{
+									aH = $("<a href='javascript:void(0);' class='verifyTime' id='"+reData[i].paperId+"' >"+reData[i].paperName+"</a>");
+								}
+								var btnA = "";
+								if (paperLev === "公开") {
+									btnA = $("<button class=\"layui-btn layui-btn-xs caller-fr\" style=\"float: right;\">\n" +
+										"\t\t\t\t\t\t\t        &nbsp;" + paperLev + "&nbsp;\n" +
+										"\t\t\t\t\t            </button>");
+								} else if (paperLev === "私密") {
+									btnA = $("<button class=\"layui-btn layui-btn-xs caller-fr layui-btn-danger\" style=\"float: right;\">\n" +
+										"\t\t\t\t\t\t\t        &nbsp;" + paperLev + "&nbsp;\n" +
+										"\t\t\t\t\t            </button>");
+								} else if (paperLev === "密码") {
+									btnA = $("<button class=\"layui-btn layui-btn-xs caller-fr layui-btn-normal\" style=\"float: right;\">\n" +
+										"\t\t\t\t\t\t\t        &nbsp;" + paperLev + "&nbsp;\n" +
+										"\t\t\t\t\t            </button>");
+								}
+								var spanA = $("<span style=\"font-size: 12px;\">考试时间："+renderTime(reData[i].startTime)+"  ~  "+renderTime(reData[i].endTime) +"</span>");
+								var divC = $("<div style=\"float: right; font-size: 12px;\">"+reData[i].userName+"</div>");
+								divA.append(aH);
+								divA.append(btnA);
+								divB.append(spanA);
+								divB.append(divC);
+								cardbodyDiv.append(divA);
+								cardbodyDiv.append(divB);
+								cardDiv.append(cardbodyDiv);
+								paperList.append(cardDiv);
+							}
+						}
+						//代表有过期试卷
+						if(pastData != null && pastData.length != 0){
+							for(var i=0;i<pastData.length;i++){
+								var paperLev = "";
+								if (pastData[i].paperLevel == 1) {
+									paperLev = "公开";
+								} else if (pastData[i].paperLevel == 2) {
+									paperLev = "私密";
+								} else if (pastData[i].paperLevel == 3) {
+									paperLev = "密码";
+								}
+								var cardDiv = $("<div class='layui-card' style='background-color: lightgray'></div>");
+								var cardbodyDiv = $("<div class='layui-card-body'></div>");
+								var divA = $("<div name='divA'></div>");
+								var divB = $("<div style='margin-top: 5px'>");
+								var aH = $("<a href='javascript:void(0);' class='verifyPast' id='"+pastData[i].paperId+"' >"+pastData[i].paperName+"</a>");
+								var btnA = "";
+								if (paperLev === "公开") {
+									btnA = $("<button class=\"layui-btn layui-btn-xs caller-fr\" style=\"float: right;\">\n" +
+										"\t\t\t\t\t\t\t        &nbsp;" + paperLev + "&nbsp;\n" +
+										"\t\t\t\t\t            </button>");
+								} else if (paperLev === "私密") {
+									btnA = $("<button class=\"layui-btn layui-btn-xs caller-fr layui-btn-danger\" style=\"float: right;\">\n" +
+										"\t\t\t\t\t\t\t        &nbsp;" + paperLev + "&nbsp;\n" +
+										"\t\t\t\t\t            </button>");
+								} else if (paperLev === "密码") {
+									btnA = $("<button class=\"layui-btn layui-btn-xs caller-fr layui-btn-normal\" style=\"float: right;\">\n" +
+										"\t\t\t\t\t\t\t        &nbsp;" + paperLev + "&nbsp;\n" +
+										"\t\t\t\t\t            </button>");
+								}
+								var spanA = $("<span style=\"font-size: 12px;\">考试时间："+renderTime(pastData[i].startTime)+"  ~  "+renderTime(pastData[i].endTime) +"</span>");
+								var divC = $("<div style=\"float: right; font-size: 12px;\">"+pastData[i].userName+"</div>");
+								divA.append(aH);
+								divA.append(btnA);
+								divB.append(spanA);
+								divB.append(divC);
+								cardbodyDiv.append(divA);
+								cardbodyDiv.append(divB);
+								cardDiv.append(cardbodyDiv);
+								paperList.append(cardDiv);
+							}
+						}
+
+					}else{
+						paperList.empty();
+						var card = $("<div class='layui-card'></div>");
+						var cardBody = $("<div class='layui-card-body'>暂无数据</div>");
+						card.append(cardBody);paperList.append(card);
+					}
+				}
+				//验证密码
+				$(document).on("click","a.verifyPassword",function(){
+					var _this = this;
+					var index = layer.open({
+						type: 2,
+						area: ['500px', '200px'],
+						fix: false, //不固定
+						maxmin: false,
+						shadeClose: true,
+						shade: 0.4,
+						title: '验证密码',
+						btn: ['确认', '关闭'],
+						content: 'verifyPassword.html',
+						yes:function (index,layero) {
+							var bodys = layer.getChildFrame("body", index);
+							var datas = bodys.find("input[name=paperPassword]").serializeArray();
+							if(datas!=null && datas.length > 0){
+								var paperPassword = datas[0].value;
+								layer.close(index);
+							}
+							$.ajax({
+								type:'post',
+								url: '/student/ifPassword',
+								data: {
+									paperPassword: paperPassword,
+									paperId: _this.id
+								},
+								dataType:'json',
+								beforeSend:function(request){
+									request.setRequestHeader("studentToken",localStorage.getItem("studentToken"));
+								},
+								success: function(res){
+									if(res.status == 1){
+										layer.msg('验证成功', {
+											offset: '15px'
+											,icon: 1
+											,time: 1000
+										}, function(){
+											location.href = 'examInfo.html?paperId='+_this.id; //后台主页
+										});
+									}else{
+										layer.msg('密码不正确', {
+											offset: '15px'
+											,icon: 2
+											,time: 1000
+										});
+									}
+								}
+							})
+						}
+					});
+				});
+				//验证是否到达考试时间
+				$(document).on("click","a.verifyTime",function(){
+					layer.confirm('还没有到达考试时间', function(index){
+						layer.close(index);
+					});
+				});
+				//不能查看过期试卷
+				$(document).on("click","a.verifyPast",function(){
+					layer.confirm('考试已过期', function(index){
+						layer.close(index);
+					});
+				});
+			});
+		</script>
+	</body>
+
+</html>

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.online_examination_system.mapper.manual.HistoryQuestionDao" >
+    <resultMap id="BaseResultMap" type="com.ssm.online_examination_system.vo.HistoryQuestionVo" >
+        <id column="user_id" property="userId" jdbcType="INTEGER" />
+        <id column="paper_id" property="paperId" jdbcType="INTEGER" />
+        <id column="question_id" property="questionId" jdbcType="INTEGER" />
+        <result column="user_question" property="userQuestion" jdbcType="VARCHAR" />
+        <result column="is_right" property="isRight" jdbcType="INTEGER" />
+        <result column="question_no" property="questionNo" jdbcType="INTEGER" />
+    </resultMap>
+    <resultMap id="onlyPaperId" type="com.ssm.online_examination_system.po.Paper">
+        <result column="paper_id" property="paperId" jdbcType="INTEGER" />
+    </resultMap>
+    <resultMap id="HistoryQuestionVoResult" type="com.ssm.online_examination_system.vo.HistoryQuestionVo">
+        <result column= "question" property="question" jdbcType="VARCHAR" />
+        <result column= "right_answer" property="rightAnswer" jdbcType="VARCHAR" />
+        <result column= "option_a" property="optionA" jdbcType="VARCHAR" />
+        <result column= "option_b" property="optionB" jdbcType="VARCHAR" />
+        <result column= "option_c" property="optionC" jdbcType="VARCHAR" />
+        <result column= "option_d" property="optionD" jdbcType="VARCHAR" />
+        <result column= "analysis" property="analysis" jdbcType="VARCHAR" />
+        <result column= "grade" property="grade" jdbcType="INTEGER" />
+        <result column= "complexity" property="complexity" jdbcType="INTEGER" />
+        <result column= "question_key" property="questionKey" jdbcType="VARCHAR" />
+        <result column="question_type" property="questionType" jdbcType="INTEGER" />
+        <result column="subject_id" property="subjectId" jdbcType="INTEGER" />
+        <result column="paper_id" property="paperId" jdbcType="INTEGER" />
+        <result column="question_id" property="questionId" jdbcType="INTEGER" />
+        <result column="user_question" property="userQuestion" jdbcType="VARCHAR" />
+        <result column="is_right" property="isRight" jdbcType="INTEGER" />
+        <result column="question_no" property="questionNo" jdbcType="INTEGER" />
+    </resultMap>
+    <sql id="Base_Column_List" >
+        user_id, paper_id, question_id, user_question, is_right
+    </sql>
+    <insert id="insertHistoryQuestion" parameterType="com.ssm.online_examination_system.vo.HistoryQuestionVo" >
+        insert into historyquestion
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="userId != null" >
+                user_id,
+            </if>
+            <if test="paperId != null" >
+                paper_id,
+            </if>
+            <if test="questionId != null" >
+                question_id,
+            </if>
+            <if test="userQuestion != null" >
+                user_question,
+            </if>
+            <if test="isRight != null" >
+                is_right,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="userId != null" >
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="paperId != null" >
+                #{paperId,jdbcType=INTEGER},
+            </if>
+            <if test="questionId != null" >
+                #{questionId,jdbcType=INTEGER},
+            </if>
+            <if test="userQuestion != null" >
+                #{userQuestion,jdbcType=VARCHAR},
+            </if>
+            <if test="isRight != null" >
+                #{isRight,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <select id="selectAllGrade" resultType="com.ssm.online_examination_system.vo.HistoryQuestionVo" parameterType="com.ssm.online_examination_system.vo.HistoryQuestionVo" >
+        select b.grade as grade,a.user_id as userId, a.paper_id as paperId, a.question_id as questionId, a.user_question as userQuestion, a.is_right as isRight
+        from historyquestion a
+        left outer join question b on a.question_id = b.question_id
+        where a.is_right = 2 and a.user_id = #{userId} and a.paper_id = #{paperId} and a.question_id = #{questionId}
+    </select>
+    <select id="getHistoryQuestionList" resultType="com.ssm.online_examination_system.vo.HistoryQuestionVo" parameterType="com.ssm.online_examination_system.vo.HistoryQuestionVo">
+        select b.question as question, b.right_answer as rightAnswer, b.option_a as optionA, b.option_b as optionB, b.option_c as optionC, b.option_d as optionD, b.analysis as analysis,
+        b.grade as grade, b.complexity as complexity, b.question_key as questionKey, b.question_type as questionType, b.subject_id as subjectId,a.user_id as userId, a.paper_id as paperId, a.question_id as questionId, a.user_question as userQuestion, a.is_right as isRight, c.question_no as questionNo
+        from historyquestion a
+        left outer join question b on a.question_id=b.question_id
+        left outer join paperdetail c on a.paper_id = c.paper_id and a.question_id = c.question_id
+        <where>
+            <if test="userId != null" >
+                and a.user_id = #{userId,jdbcType=INTEGER}
+            </if>
+            <if test="paperId != null" >
+                and a.paper_id = #{paperId,jdbcType=INTEGER}
+            </if>
+        </where>
+    </select>
+    <select id="getHistoryPaperList"  parameterType="com.ssm.online_examination_system.po.Users"  resultMap="onlyPaperId">
+       select distinct paper_id
+       from historyquestion
+        <where>
+            <if test="userId != null" >
+                and user_id = #{userId,jdbcType=INTEGER}
+            </if>
+        </where>
+    </select>
+</mapper>

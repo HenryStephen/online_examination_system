@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.online_examination_system.mapper.manual.UsersDao" >
+	<resultMap id="BaseResultMap" type="com.ssm.online_examination_system.po.Users">
+		<result column="user_id" jdbcType="INTEGER" property="userId" />
+		<result column="user_name" jdbcType="VARCHAR" property="userName" />
+		<result column="user_password" jdbcType="VARCHAR" property="userPassword" />
+		<result column="user_telephone" jdbcType="VARCHAR" property="userTelephone" />
+		<result column="user_email" jdbcType="VARCHAR" property="userEmail" />
+		<result column="user_sex" jdbcType="INTEGER" property="userSex" />
+		<result column="user_realname" jdbcType="VARCHAR" property="userRealname" />
+		<result column="user_status" jdbcType="INTEGER" property="userStatus" />
+		<result column="user_academy" jdbcType="VARCHAR" property="userAcademy" />
+		<result column="user_role" jdbcType="INTEGER" property="userRole" />
+	</resultMap>
+	<sql id="Base_Column_List" >
+	    user_id, user_name, user_password, user_telephone, user_email, user_sex, user_realname,
+	    user_status,user_academy,user_role
+  	</sql>
+	<sql id="Base_Column_List_Exclude_Password" >
+	    user_id, user_name, user_telephone, user_email, user_sex, user_realname,
+	    user_status,user_academy,user_role
+  	</sql>
+	<select id="selectBySelective" resultMap="BaseResultMap" parameterType="com.ssm.online_examination_system.po.Users" >
+		select
+		<include refid="Base_Column_List_Exclude_Password" />
+		from users
+		<where>
+			<if test="userName != null" >
+				and user_name = #{userName,jdbcType=VARCHAR}
+			</if>
+			<if test="userPassword != null" >
+				and user_password = #{userPassword,jdbcType=VARCHAR}
+			</if>
+			<if test="userTelephone != null" >
+				and user_telephone = #{userTelephone,jdbcType=VARCHAR}
+			</if>
+			<if test="userEmail != null" >
+				and user_email = #{userEmail,jdbcType=VARCHAR}
+			</if>
+			<if test="userSex != null" >
+				and user_sex = #{userSex,jdbcType=INTEGER}
+			</if>
+			<if test="userRealname != null" >
+				and user_realname = #{userRealname,jdbcType=VARCHAR}
+			</if>
+			<if test="userStatus != null" >
+				and user_status = #{userStatus,jdbcType=INTEGER}
+			</if>
+			<if test="userAcademy != null" >
+				and user_academy = #{userAcademy,jdbcType=VARCHAR}
+			</if>
+			<if test="userRole != null" >
+				and user_role = #{userRole,jdbcType=INTEGER}
+			</if>
+		</where>
+	</select>
+	<select id="selectUserByUserName" resultMap="BaseResultMap" parameterType="com.ssm.online_examination_system.po.Users">
+		select
+		<include refid="Base_Column_List" />
+		from users
+		<where>
+			<if test="userName != null" >
+				and user_name = #{userName,jdbcType=VARCHAR}
+			</if>
+		</where>
+	</select>
+</mapper>

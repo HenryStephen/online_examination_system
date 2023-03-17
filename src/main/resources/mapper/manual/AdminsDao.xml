@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssm.online_examination_system.mapper.manual.AdminsDao" >
+	<resultMap id="BaseResultMap" type="com.ssm.online_examination_system.po.Admins" >
+		<id column="admin_id" property="adminId" jdbcType="INTEGER" />
+		<result column="admin_name" property="adminName" jdbcType="VARCHAR" />
+		<result column="admin_password" property="adminPassword" jdbcType="VARCHAR" />
+		<result column="admin_telephone" property="adminTelephone" jdbcType="VARCHAR" />
+		<result column="admin_email" property="adminEmail" jdbcType="VARCHAR" />
+		<result column="admin_sex" property="adminSex" jdbcType="INTEGER" />
+		<result column="admin_realname" property="adminRealname" jdbcType="VARCHAR" />
+		<result column="admin_status" property="adminStatus" jdbcType="INTEGER" />
+	</resultMap>
+	<sql id="Base_Column_List" >
+	    admin_id, admin_name, admin_password, admin_telephone, admin_email, admin_sex, admin_realname,
+	    admin_status
+  	</sql>
+	<sql id="Base_Column_List_Exclude_Password" >
+	    admin_id, admin_name, admin_telephone, admin_email, admin_sex, admin_realname,
+	    admin_status
+  	</sql>
+	<select id="selectBySelective" resultMap="BaseResultMap" parameterType="Admins" >
+		select
+		<include refid="Base_Column_List_Exclude_Password" />
+		from admins
+		<where>
+			<if test="adminId != null" >
+				and admin_id = #{adminId,jdbcType=INTEGER}
+			</if>
+			<if test="adminName != null" >
+				and admin_name = #{adminName,jdbcType=INTEGER}
+			</if>
+			<if test="adminPassword != null" >
+				and admin_password = #{adminPassword,jdbcType=VARCHAR}
+			</if>
+			<if test="adminTelephone != null" >
+				and admin_telephone = #{adminTelephone,jdbcType=INTEGER}
+			</if>
+			<if test="adminEmail != null" >
+				and admin_email = #{adminEmail,jdbcType=INTEGER}
+			</if>
+			<if test="adminSex != null" >
+				and admin_sex = #{adminSex,jdbcType=INTEGER}
+			</if>
+			<if test="adminRealname != null" >
+				and admin_realname = #{adminRealname,jdbcType=INTEGER}
+			</if>
+			<if test="adminStatus != null" >
+				and admin_status = #{adminStatus,jdbcType=INTEGER}
+			</if>
+		</where>
+	</select>
+</mapper>
